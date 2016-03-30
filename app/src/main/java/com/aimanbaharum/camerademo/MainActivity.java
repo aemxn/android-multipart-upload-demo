@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.adeel.library.easyFTP;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CAMERA = 1001;
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final int REQUEST_GALLERY = 1002;
-    private static final String API_URL = "http://api.aimanbaharum.com/shoppermate-test/upload.php";
+
 
     private Bitmap mBitmap;
     private Button btn_upload;
@@ -84,14 +87,53 @@ public class MainActivity extends AppCompatActivity {
     View.OnClickListener upload = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
+            /**
+             * FTP upload
+             */
+//            uploadFtp();
+            new UploadFTP().execute();
+
+
             /** Multipart upload */
-            try {
-                execMultipartPost();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                execMultipartPost();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     };
+
+    private class UploadFTP extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            et_response.setHint("Uploading...");
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+//            File file = new File(selectedImageUri.getPath());
+
+            try {
+                easyFTP ftp = new easyFTP();
+                ftp.connect(Constants.FTP_HOST, Constants.FTP_USER, Constants.FTP_PASSWORD);
+                ftp.setWorkingDirectory("/shoppermate_uploads/");
+                ftp.uploadFile(selectedImageUri.getPath());
+                return "Upload ftp ok";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Upload ftp failed. Please see stack trace";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            et_response.setText(s);
+        }
+    }
 
     private void execMultipartPost() throws Exception {
         File file = new File(selectedImageUri.getPath());
@@ -108,11 +150,11 @@ public class MainActivity extends AppCompatActivity {
                 .addFormDataPart("fileTypeName", "img")
                 .addFormDataPart("clientFilePath", selectedImageUri.getPath())
                 .addFormDataPart("filedata", filename + ".png", fileBody)
-                // timestamp
+                        // timestamp
                 .build();
 
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(Constants.API_URL)
                 .post(requestBody)
                 .build();
 
