@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aimanbaharum.camerademo.helper.ImageUtils;
+import com.aimanbaharum.camerademo.helper.RealPathUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -196,20 +199,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static final int REQUEST_GALLERY_KITKAT = 1003;
-
     private void initGalleryIntent() {
-        if (Build.VERSION.SDK_INT < 19){
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(intent, REQUEST_GALLERY_KITKAT);
-        } else {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_GALLERY);
-        }
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, REQUEST_GALLERY);
     }
 
     private void initCameraIntent() {
@@ -251,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
                 realPath = selectedImageUri.getPath();
-            } else if (requestCode == REQUEST_GALLERY || requestCode == REQUEST_GALLERY_KITKAT) {
+            } else if (requestCode == REQUEST_GALLERY) {
                 selectedImageUri = data.getData();
                 if (Build.VERSION.SDK_INT < 11) {
                     realPath = RealPathUtil.getRealPathFromURI_BelowAPI11(this, data.getData());

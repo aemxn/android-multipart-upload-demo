@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aimanbaharum.camerademo.helper.RealPathUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 

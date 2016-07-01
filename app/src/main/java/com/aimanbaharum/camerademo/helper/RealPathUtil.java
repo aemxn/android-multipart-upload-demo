@@ -1,4 +1,4 @@
-package com.aimanbaharum.camerademo;
+package com.aimanbaharum.camerademo.helper;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,28 +16,36 @@ public class RealPathUtil {
     @SuppressLint("NewApi")
     public static String getRealPathFromURI_API19(Context context, Uri uri){
         String filePath = "";
-        String wholeID = DocumentsContract.getDocumentId(uri);
+        try { // FIXME NPE error when select image from QuickPic, Dropbox etc
+            String wholeID = DocumentsContract.getDocumentId(uri);
+            // Split at colon, use second item in the array
+            String id = wholeID.split(":")[1];
+            String[] column = {MediaStore.Images.Media.DATA};
+            // where id is equal to
+            String sel = MediaStore.Images.Media._ID + "=?";
+            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{id}, null);
+            int columnIndex = cursor.getColumnIndex(column[0]);
+            if (cursor.moveToFirst()) {
+                filePath = cursor.getString(columnIndex);
+            }
 
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
+            cursor.close();
 
-        String[] column = { MediaStore.Images.Media.DATA };
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{ id }, null);
-
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
+            return filePath;
+        } catch (Exception e) { // this is the fix lol
+            String result;
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            if (cursor == null) { // Source is Dropbox or other similar local file path
+                result = uri.getPath();
+            } else {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                result = cursor.getString(idx);
+                cursor.close();
+            }
+            return result;
         }
-
-        cursor.close();
-
-        return filePath;
     }
 
 

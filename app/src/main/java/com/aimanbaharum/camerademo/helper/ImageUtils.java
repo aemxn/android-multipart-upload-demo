@@ -1,4 +1,4 @@
-package com.aimanbaharum.camerademo;
+package com.aimanbaharum.camerademo.helper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
