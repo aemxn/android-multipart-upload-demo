@@ -1,5 +1,7 @@
 # Demo Image Upload in Android
 
+Change AndroidManifest.xml to use different activities
+
 1. MainActivity
     - http call to upload server occurs here
     - take photo from camera or gallery
