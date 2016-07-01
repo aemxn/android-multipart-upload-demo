@@ -5,7 +5,7 @@
     - take photo from camera or gallery
     
 2. AnotherActivity
-    - Nothing, just a reference
+    - Getting real path of an image instead of a URI
     
 3. SelectImageActivity
     - Demonstrate on using Helper method
