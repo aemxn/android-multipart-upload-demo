@@ -110,13 +110,25 @@ public class ImageInputHelper {
             }
         }
 
-        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        // Using native image explorer
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUriFromSource);
-        if (fragment == null) {
-            mContext.startActivityForResult(intent, REQUEST_PICTURE_FROM_GALLERY);
-        } else {
+        if (fragment != null) {
             fragment.startActivityForResult(intent, REQUEST_PICTURE_FROM_GALLERY);
+        } else {
+            mContext.startActivityForResult(intent, REQUEST_PICTURE_FROM_GALLERY);
         }
+
+        // Using intent picker
+//        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUriFromSource);
+//        if (fragment != null) {
+//            fragment.startActivityForResult(intent, REQUEST_PICTURE_FROM_GALLERY);
+//        } else {
+//            mContext.startActivityForResult(intent, REQUEST_PICTURE_FROM_GALLERY);
+//        }
     }
 
     /**
